@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Architect Copilot</title>
+  <link rel="stylesheet" href="panel.css">
+</head>
+<body>
+  <header>
+    <h1>Architect Copilot</h1>
+  </header>
+  <main>
+    <section class="ask">
+      <form id="form">
+        <input id="ask" type="text" placeholder="Ask: create architecture, tradeoffs, what-if…" />
+        <button type="submit">Go</button>
+      </form>
+      <div id="budget" class="budget"></div>
+    </section>
+    <section id="context" class="context"></section>
+    <section id="out" class="out"></section>
+    <section id="controls" class="controls">
+      <button id="copyMermaid">Copy Mermaid</button>
+      <button id="downloadMermaid">Download .mmd</button>
+      <label><input type="checkbox" id="showGrounding" checked> Show grounding</label>
+    </section>
+  </main>
+  <script src="panel.js"></script>
+</body>
+</html>
