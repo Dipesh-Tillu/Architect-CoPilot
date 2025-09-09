@@ -1,21 +1,16 @@
 <!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Architect Copilot Options</title>
-  <style>
-    body { font-family: system-ui, Arial, sans-serif; padding: 16px; }
-    label { display: block; margin: 8px 0 4px; }
-    input[type=text], input[type=number] { width: 420px; padding: 6px; }
-  </style>
-</head>
-<body>
-  <h1>Options</h1>
-  <label>Backend URL</label>
-  <input id="backend" type="text" placeholder="http://127.0.0.1:8000" />
-  <label>Token budget per hour</label>
-  <input id="budget" type="number" placeholder="100000" />
-  <button id="save">Save</button>
-  <script src="options.js"></script>
-</body>
-</html>
+<meta charset="utf-8">
+<title>Architect Copilot – Settings</title>
+<style>
+  body{font-family:system-ui;padding:16px}
+  label{display:block;margin-top:12px}
+  input{width:420px;padding:8px;border-radius:8px;border:1px solid #ccc}
+  button{margin-top:16px;padding:8px 14px;border:0;border-radius:8px;background:#205ad6;color:#fff;cursor:pointer}
+</style>
+<h1>Architect Copilot – Settings</h1>
+<label>OpenAI API Key</label>
+<input id="key" type="password" placeholder="sk-..." />
+<label>Model</label>
+<input id="model" type="text" value="gpt-4o-mini" />
+<button id="save">Save</button>
+<script src="options.js"></script>

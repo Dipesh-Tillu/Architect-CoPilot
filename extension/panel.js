@@ -1,66 +1,38 @@
-const form = document.getElementById("form");
-const input = document.getElementById("ask");
-const out = document.getElementById("out");
-const ctx = document.getElementById("context");
-const budget = document.getElementById("budget");
-const showGrounding = document.getElementById("showGrounding");
-let lastMermaid = "";
-let lastGrounding = [];
+const askEl = document.getElementById("ask");
+const goEl = document.getElementById("go");
+const ctxEl = document.getElementById("ctx");
+const outEl = document.getElementById("out");
 
-function renderBudget(b) {
-  if (!b) return;
-  budget.textContent = `Tokens used this hour: ${b.usedTokensThisHour || 0} / ${b.tokenBudgetPerHour || 0}`;
+function renderCtx(items){
+  if (!items || !items.length) { ctxEl.textContent = "No context captured yet."; return; }
+  ctxEl.innerHTML = items.map(i => `<div><strong>${i.title || i.url}</strong><br><small>${i.url}</small></div>`).join("");
 }
-
-function renderContext(items) {
-  if (!items || !items.length) { ctx.innerHTML = ""; return; }
-  const lis = items.map(i => `<li title="${i.url}">${i.title || i.url}</li>`).join("");
-  ctx.innerHTML = `<strong>Using context from:</strong><ul>${lis}</ul>`;
+function renderResult(r){
+  if (r.error) {
+    outEl.innerHTML = `<pre>${r.error}</pre>`;
+    return;
+  }
+  const cites = (r.citations || []).map(c => `<li><a href="${c.url}" target="_blank" rel="noreferrer">${c.title || c.url}</a></li>`).join("");
+  outEl.innerHTML = `
+    <div class="row">
+      <div class="col"><h3>Answer</h3><pre>${escapeHtml(r.text || "")}</pre></div>
+      <div class="col"><h3>Mermaid</h3><pre>${escapeHtml(r.mermaid || "")}</pre></div>
+    </div>
+    <div class="sec"><h3>Grounding</h3><ul>${cites || "<li>None</li>"}</ul></div>
+  `;
 }
-
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  out.textContent = "Thinking…";
-  chrome.runtime.sendMessage({ type: "GENERATE", ask: input.value });
-});
+function escapeHtml(s){ return (s||"").replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
 chrome.runtime.onMessage.addListener((msg) => {
-  if (msg.type === "CONTEXT_SNAPSHOT") { renderContext(msg.data); renderBudget(msg.budget); }
-  if (msg.type === "RESULT") {
-    renderBudget(msg.budget);
-    if (msg.data?.error) {
-      out.textContent = "Error: " + msg.data.error + "\nIs the backend running?";
-      return;
-    }
-    const { text, mermaid, citations, grounding } = msg.data;
-    lastMermaid = mermaid || "";
-    lastGrounding = grounding || [];
-    const cites = (citations || []).map(c => `<li><a href="${c.url}" target="_blank">${c.title || c.url}</a></li>`).join("");
-    const groundHtml = (grounding && showGrounding.checked)
-      ? `<div class="grounding"><strong>Grounding</strong><ul>${grounding.map(g=>`<li>${g.slice(0,240)}…</li>`).join("")}</ul></div>`
-      : "";
-    out.innerHTML = `<div><strong>Answer</strong></div><div>${text || ""}</div><hr/><div><strong>Mermaid</strong></div><pre>${lastMermaid}</pre><hr/><div><strong>Citations</strong></div><ul>${cites}</ul>${groundHtml}`;
-  }
+  if (msg.type === "CONTEXT_SNAPSHOT") renderCtx(msg.data);
+  if (msg.type === "RESULT") renderResult(msg.data);
 });
+function ping(){ try { chrome.runtime.sendMessage({ type: "PANEL_READY" }); } catch {} }
+ping();
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") ping(); });
 
-document.getElementById("copyMermaid").addEventListener("click", async () => {
-  if (!lastMermaid) return;
-  await navigator.clipboard.writeText(lastMermaid);
+goEl.addEventListener("click", () => {
+  const q = askEl.value.trim();
+  if (!q) return;
+  try { chrome.runtime.sendMessage({ type: "GENERATE", ask: q }); } catch (e) { renderResult({ error: String(e) }); }
 });
-
-document.getElementById("downloadMermaid").addEventListener("click", async () => {
-  if (!lastMermaid) return;
-  const blob = new Blob([lastMermaid], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "diagram.mmd";
-  a.click();
-  URL.revokeObjectURL(url);
-});
-
-showGrounding.addEventListener("change", () => {
-  chrome.runtime.sendMessage({ type: "PANEL_READY" });
-});
-
-chrome.runtime.sendMessage({ type: "PANEL_READY" });

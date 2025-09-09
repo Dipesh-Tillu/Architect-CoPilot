@@ -1,30 +1,23 @@
 <!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Architect Copilot</title>
-  <link rel="stylesheet" href="panel.css">
-</head>
-<body>
-  <header>
-    <h1>Architect Copilot</h1>
-  </header>
-  <main>
-    <section class="ask">
-      <form id="form">
-        <input id="ask" type="text" placeholder="Ask: create architecture, tradeoffs, what-if…" />
-        <button type="submit">Go</button>
-      </form>
-      <div id="budget" class="budget"></div>
-    </section>
-    <section id="context" class="context"></section>
-    <section id="out" class="out"></section>
-    <section id="controls" class="controls">
-      <button id="copyMermaid">Copy Mermaid</button>
-      <button id="downloadMermaid">Download .mmd</button>
-      <label><input type="checkbox" id="showGrounding" checked> Show grounding</label>
-    </section>
-  </main>
-  <script src="panel.js"></script>
-</body>
-</html>
+<meta charset="utf-8">
+<title>Architect Copilot</title>
+<style>
+  body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;padding:12px;margin:0}
+  #ctx{font-size:12px;color:#444;max-height:120px;overflow:auto;border:1px solid #eee;border-radius:8px;padding:8px}
+  #ask{width:100%;box-sizing:border-box;padding:8px;border-radius:8px;border:1px solid #ccc;margin:8px 0}
+  #go{padding:8px 12px;border:0;border-radius:8px;background:#205ad6;color:#fff;cursor:pointer}
+  #out{margin-top:12px}
+  pre{white-space:pre-wrap;word-wrap:break-word;background:#fafafa;border:1px solid #eee;border-radius:8px;padding:8px}
+  .row{display:flex;gap:8px}
+  .col{flex:1}
+  .sec{margin-top:12px}
+</style>
+<div class="sec">
+  <div class="row">
+    <input id="ask" placeholder="Ask for an architecture, tradeoff, or what-if..." />
+    <button id="go">Generate</button>
+  </div>
+  <div id="ctx"></div>
+</div>
+<div id="out" class="sec"></div>
+<script src="panel.js"></script>
