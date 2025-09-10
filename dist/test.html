@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page for Browser Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .header {
+            background: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .content {
+            background: white;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to the Browser Assistant Test Page</h1>
+        <p>This page is designed to test the functionality of the Browser Assistant Chrome extension.</p>
+    </div>
+
+    <div class="content">
+        <h2>About This Page</h2>
+        <p>This is a sample webpage created to demonstrate the capabilities of the Browser Assistant extension. The extension should be able to analyze this content and provide intelligent summaries and answers to questions about it.</p>
+
+        <h3>Key Features to Test</h3>
+        <ul>
+            <li><strong>Page Analysis:</strong> The assistant should automatically analyze this page when opened</li>
+            <li><strong>Content Summarization:</strong> It should provide a concise summary of the page content</li>
+            <li><strong>Question Answering:</strong> You should be able to ask questions about the content</li>
+            <li><strong>Context Awareness:</strong> The assistant should understand the page context when responding</li>
+        </ul>
+
+        <div class="highlight">
+            <h4>Test Questions to Try</h4>
+            <p>Here are some questions you can ask the assistant to test its functionality:</p>
+            <ul>
+                <li>"What is this page about?"</li>
+                <li>"Summarize the key features mentioned"</li>
+                <li>"What are the test questions listed?"</li>
+                <li>"Explain the purpose of this test page"</li>
+            </ul>
+        </div>
+
+        <h3>Technical Information</h3>
+        <p>This page contains various HTML elements including headers, paragraphs, lists, and styled divs. The Browser Assistant should be able to extract and understand the text content from all these elements.</p>
+
+        <h3>Sample Content</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+        <h3>Conclusion</h3>
+        <p>This test page provides a good foundation for testing the Browser Assistant extension. The content is structured and contains various elements that should help verify the extension's ability to understand and analyze web page content.</p>
+    </div>
+
+    <script>
+        // Add some dynamic content to test JavaScript execution
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Test page loaded successfully');
+            
+            // Add a timestamp
+            const timestamp = document.createElement('p');
+            timestamp.textContent = 'Page loaded at: ' + new Date().toLocaleString();
+            timestamp.style.fontSize = '12px';
+            timestamp.style.color = '#666';
+            timestamp.style.marginTop = '20px';
+            timestamp.style.padding = '10px';
+            timestamp.style.backgroundColor = '#f9f9f9';
+            timestamp.style.borderRadius = '4px';
+            document.body.appendChild(timestamp);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph Agent Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: white;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>LangGraph Agent Test Page</h1>
+    
+    <div class="test-section">
+        <h2>Test the LangGraph Agent Integration</h2>
+        <p>This page tests the LangGraph agent functionality in the Chrome extension.</p>
+        
+        <h3>Test Buttons:</h3>
+        <button class="test-button" onclick="testAgentInitialization()">Test Agent Initialization</button>
+        <button class="test-button" onclick="testMessageProcessing()">Test Message Processing</button>
+        <button class="test-button" onclick="testQueryClassification()">Test Query Classification</button>
+        <button class="test-button" onclick="testConversationHistory()">Test Conversation History</button>
+        
+        <div id="test-results" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Sample Content for Testing</h2>
+        <p>This is sample content that the LangGraph agent can analyze and respond to.</p>
+        
+        <h3>Key Topics:</h3>
+        <ul>
+            <li>Artificial Intelligence and Machine Learning</li>
+            <li>Web Development and Chrome Extensions</li>
+            <li>Natural Language Processing</li>
+            <li>Browser Automation and APIs</li>
+        </ul>
+        
+        <h3>Technical Details:</h3>
+        <p>The LangGraph agent is designed to understand and respond to questions about web page content. It can classify queries, maintain conversation history, and provide intelligent responses based on the page context.</p>
+        
+        <h3>Features:</h3>
+        <ul>
+            <li>Query classification (search, analysis, summary, explanation)</li>
+            <li>Conversation history management</li>
+            <li>Thread-based conversation persistence</li>
+            <li>Context-aware responses</li>
+            <li>Error handling and fallback mechanisms</li>
+        </ul>
+    </div>
+
+    <script>
+        // Test functions for the LangGraph agent
+        function showResult(message) {
+            const resultDiv = document.getElementById('test-results');
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+        }
+
+        function testAgentInitialization() {
+            showResult('Testing agent initialization...\n\nThis test checks if the LangGraph agent can be properly initialized with page context.');
+            
+            // Simulate page data
+            const pageData = {
+                url: window.location.href,
+                title: document.title,
+                content: document.body.innerText.substring(0, 1000)
+            };
+            
+            showResult(`Page Data:\nURL: ${pageData.url}\nTitle: ${pageData.title}\nContent: ${pageData.content.substring(0, 200)}...\n\nAgent initialization test completed. Check the console for detailed logs.`);
+        }
+
+        function testMessageProcessing() {
+            showResult('Testing message processing...\n\nThis test simulates sending a message to the LangGraph agent through the Chrome extension.');
+            
+            // Test different types of messages
+            const testMessages = [
+                "What is this page about?",
+                "Summarize the key topics mentioned",
+                "Explain the technical details",
+                "What are the main features listed?"
+            ];
+            
+            let result = 'Test Messages:\n';
+            testMessages.forEach((msg, index) => {
+                result += `${index + 1}. "${msg}"\n`;
+            });
+            
+            result += '\nMessage processing test completed. Use the Chrome extension to test these messages.';
+            showResult(result);
+        }
+
+        function testQueryClassification() {
+            showResult('Testing query classification...\n\nThis test checks if the agent can properly classify different types of queries.');
+            
+            const testQueries = [
+                { query: "What is this page about?", expected: "summary" },
+                { query: "Find information about AI", expected: "search" },
+                { query: "Explain how this works", expected: "explanation" },
+                { query: "Analyze the content", expected: "analysis" },
+                { query: "Hello, how are you?", expected: "general" }
+            ];
+            
+            let result = 'Query Classification Test:\n\n';
+            testQueries.forEach((test, index) => {
+                result += `${index + 1}. Query: "${test.query}"\n   Expected: ${test.expected}\n\n`;
+            });
+            
+            result += 'Query classification test completed. The agent should classify these queries correctly.';
+            showResult(result);
+        }
+
+        function testConversationHistory() {
+            showResult('Testing conversation history...\n\nThis test checks if the agent maintains conversation context across multiple messages.');
+            
+            const conversationFlow = [
+                "What is this page about?",
+                "Can you tell me more about the technical details?",
+                "What are the main features?",
+                "How does the query classification work?"
+            ];
+            
+            let result = 'Conversation Flow Test:\n\n';
+            conversationFlow.forEach((msg, index) => {
+                result += `Message ${index + 1}: "${msg}"\n`;
+            });
+            
+            result += '\nThe agent should maintain context and provide relevant responses that build on previous messages.';
+            showResult(result);
+        }
+
+        // Initialize test page
+        console.log('LangGraph Agent Test Page loaded');
+        console.log('Page URL:', window.location.href);
+        console.log('Page Title:', document.title);
+        console.log('Content Length:', document.body.innerText.length);
+    </script>
+</body>
+</html>

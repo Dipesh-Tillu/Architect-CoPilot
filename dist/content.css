@@ -1,0 +1,59 @@
+/* Content script styles for the browser assistant */
+
+#browser-assistant-panel {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+#browser-assistant-panel * {
+  box-sizing: border-box;
+}
+
+#browser-assistant-panel input[type="text"] {
+  font-size: 14px;
+}
+
+#browser-assistant-panel button {
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+#browser-assistant-panel button:hover {
+  opacity: 0.8;
+}
+
+#browser-assistant-panel #send-message:hover {
+  background-color: #0056b3;
+}
+
+#browser-assistant-panel #close-assistant:hover {
+  color: #333;
+}
+
+/* Ensure the panel doesn't interfere with page content */
+#browser-assistant-panel {
+  pointer-events: auto;
+}
+
+/* Smooth scrolling for chat container */
+#chat-container {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for chat container */
+#chat-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+#chat-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+#chat-container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+#chat-container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .debug-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Browser Assistant Debug Page</h1>
+    
+    <div class="debug-info">
+        <h3>Debug Information:</h3>
+        <p><strong>Page URL:</strong> <span id="page-url"></span></p>
+        <p><strong>Page Title:</strong> <span id="page-title"></span></p>
+        <p><strong>Extension Status:</strong> <span id="extension-status">Checking...</span></p>
+        <p><strong>Assistant Panel:</strong> <span id="panel-status">Checking...</span></p>
+    </div>
+
+    <div>
+        <h3>Test Buttons:</h3>
+        <button class="test-button" onclick="testExtension()">Test Extension Connection</button>
+        <button class="test-button" onclick="testPanel()">Test Panel Creation</button>
+        <button class="test-button" onclick="checkConsole()">Check Console</button>
+    </div>
+
+    <div class="debug-info">
+        <h3>Console Logs:</h3>
+        <div id="console-logs" style="max-height: 200px; overflow-y: auto; background: white; padding: 10px; border: 1px solid #ccc;"></div>
+    </div>
+
+    <div>
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Open Chrome DevTools (F12)</li>
+            <li>Go to the Console tab</li>
+            <li>Click the extension icon in the toolbar</li>
+            <li>Click "Open Assistant"</li>
+            <li>Check for any error messages in the console</li>
+            <li>Use the test buttons above to debug</li>
+        </ol>
+    </div>
+
+    <script>
+        // Set page info
+        document.getElementById('page-url').textContent = window.location.href;
+        document.getElementById('page-title').textContent = document.title;
+
+        // Check if extension is available
+        function checkExtension() {
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                document.getElementById('extension-status').textContent = 'Extension API available';
+                return true;
+            } else {
+                document.getElementById('extension-status').textContent = 'Extension API not available';
+                return false;
+            }
+        }
+
+        // Check if assistant panel exists
+        function checkPanel() {
+            const panel = document.getElementById('browser-assistant-panel');
+            if (panel) {
+                document.getElementById('panel-status').textContent = 'Panel exists';
+                return true;
+            } else {
+                document.getElementById('panel-status').textContent = 'Panel not found';
+                return false;
+            }
+        }
+
+        // Test extension connection
+        function testExtension() {
+            if (checkExtension()) {
+                chrome.runtime.sendMessage({action: 'test'}, (response) => {
+                    logToConsole('Extension test response: ' + JSON.stringify(response));
+                });
+            } else {
+                logToConsole('Extension not available');
+            }
+        }
+
+        // Test panel creation
+        function testPanel() {
+            if (checkPanel()) {
+                logToConsole('Panel already exists');
+                const panel = document.getElementById('browser-assistant-panel');
+                panel.style.right = '0';
+            } else {
+                logToConsole('Creating test panel...');
+                const testPanel = document.createElement('div');
+                testPanel.id = 'browser-assistant-panel';
+                testPanel.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    right: 0;
+                    width: 400px;
+                    height: 100vh;
+                    background: #ffffff;
+                    border-left: 1px solid #e0e0e0;
+                    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+                    z-index: 10000;
+                    padding: 20px;
+                `;
+                testPanel.innerHTML = '<h3>Test Panel</h3><p>This is a test panel to verify the extension is working.</p>';
+                document.body.appendChild(testPanel);
+                logToConsole('Test panel created');
+            }
+        }
+
+        // Check console for errors
+        function checkConsole() {
+            logToConsole('Checking console...');
+            // This will show any console errors
+        }
+
+        // Log to the debug console
+        function logToConsole(message) {
+            const logs = document.getElementById('console-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logs.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        // Override console.log to capture logs
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            logToConsole(args.join(' '));
+        };
+
+        // Initial checks
+        checkExtension();
+        checkPanel();
+
+        // Check periodically
+        setInterval(() => {
+            checkPanel();
+        }, 2000);
+
+        // Listen for messages from extension
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+            chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+                logToConsole('Received message: ' + JSON.stringify(request));
+                sendResponse({received: true});
+            });
+        }
+    </script>
+</body>
+</html>
