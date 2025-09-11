@@ -1,5 +1,6 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
@@ -39,7 +40,14 @@ module.exports = {
         { from: 'debug.html', to: 'debug.html' },
         { from: 'README.md', to: 'README.md' }
       ]
-    })
+    }),
+    // Handle node: URI scheme
+    new webpack.NormalModuleReplacementPlugin(
+      /^node:/,
+      (resource) => {
+        resource.request = resource.request.replace(/^node:/, '');
+      }
+    )
   ],
   resolve: {
     fallback: {
@@ -54,7 +62,19 @@ module.exports = {
       "os": false,
       "net": false,
       "tls": false,
-      "child_process": false
+      "child_process": false,
+      "async_hooks": false,
+      "events": false,
+      "http": false,
+      "https": false,
+      "zlib": false,
+      "querystring": false,
+      "readline": false,
+      "repl": false,
+      "timers": false,
+      "tty": false,
+      "vm": false,
+      "worker_threads": false
     }
   },
   optimization: {

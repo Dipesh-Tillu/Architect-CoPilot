@@ -1,7 +1,7 @@
 // LangGraph Agent using actual LangChain packages
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage } from "@langchain/core/messages";
-import { createAgentExecutor } from "@langchain/langgraph/prebuilt";
+import { createReactAgent } from "@langchain/langgraph/prebuilt";
 
 export class LangGraphAgent {
   constructor(apiKey, baseUrl = 'https://api.openai.com/v1') {
@@ -45,8 +45,8 @@ export class LangGraphAgent {
     try {
       // Create the LLM
       const llm = new ChatOpenAI({
-        openAIApiKey: this.apiKey,
-        modelName: 'gpt-3.5-turbo',
+        apiKey: this.apiKey,
+        model: 'gpt-4o-mini',
         temperature: 0.7,
         maxTokens: 1000
       });
@@ -63,11 +63,14 @@ export class LangGraphAgent {
 
       // Create the agent executor with error handling
       try {
-        this.agent = createAgentExecutor({
-          llm: llm,
-          tools: [] // We'll add tools later if needed
-        });
-        console.log('LangGraphAgent: Agent executor created successfully');
+        // Try to create a simple agent without complex configuration
+        // First check if the LLM has the required methods
+          this.agent = createReactAgent({
+            llm: llm,
+            tools: [] // We'll add tools later if needed
+          });
+          console.log('LangGraphAgent: Agent executor created successfully');
+
       } catch (agentError) {
         console.error('LangGraphAgent: Failed to create agent executor:', agentError);
         // If agent creation fails, we'll use the LLM directly
@@ -113,16 +116,10 @@ export class LangGraphAgent {
         try {
           // First try the standard invoke method
           result = await this.agent.invoke({
-            input: contextualMessage,
             messages: [new HumanMessage(contextualMessage)]
           });
         } catch (invokeError) {
           console.warn('LangGraphAgent: Standard invoke failed, trying alternative method:', invokeError);
-          
-          // Fallback: try with just the input
-          result = await this.agent.invoke({
-            input: contextualMessage
-          });
         }
       } else {
         // Agent is null, use LLM directly
