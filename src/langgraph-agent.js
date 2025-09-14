@@ -5,6 +5,7 @@ import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { MermaidDiagramTool } from "./mermaid-tool.js";
 import { StateGraph, MessagesAnnotation } from "@langchain/langgraph/web";
 import { Client } from "langsmith";
+import { LangChainTracer } from "@langchain/core/tracers/tracer_langchain";
 
 export class LangGraphAgent {
   constructor(apiKey, 
@@ -22,6 +23,30 @@ export class LangGraphAgent {
     this.supervisor = null;
     this.initialized = false;
     this.tracer = null;
+    
+    // Set LangSmith environment variables immediately
+    this.setLangSmithEnvironment();
+  }
+
+  // Set LangSmith environment variables
+  setLangSmithEnvironment() {
+    if (this.langsmithApiKey) {
+      // Set environment variables for LangSmith tracing
+      if (typeof process !== 'undefined') {
+        process.env.LANGSMITH_TRACING = 'true';
+        process.env.LANGSMITH_API_KEY = this.langsmithApiKey;
+        process.env.LANGSMITH_PROJECT = this.langsmithProject;
+      }
+      
+      // Also set in window object for browser environment
+      if (typeof window !== 'undefined') {
+        window.LANGSMITH_TRACING = 'true';
+        window.LANGSMITH_API_KEY = this.langsmithApiKey;
+        window.LANGSMITH_PROJECT = this.langsmithProject;
+      }
+      
+      console.log('LangGraphAgent: LangSmith environment variables set');
+    }
   }
 
   // Initialize the agent with page context
@@ -53,13 +78,37 @@ export class LangGraphAgent {
   // Setup the LangGraph agent
   async setupAgent() {
     try {
-      // Create the LLM
-      const llm = new ChatOpenAI({
+      // Validate API key before creating LLM
+      if (!this.apiKey) {
+        throw new Error('API key is required but not provided');
+      }
+
+      // Create the LLM with LangSmith tracing
+      const llmConfig = {
         apiKey: this.apiKey,
         model: 'gpt-4o-mini',
         temperature: 0.7,
-        maxTokens: 1000
+        // maxTokens: 1000
+      };
+
+      // Add LangSmith tracer if available
+      if (this.langsmithApiKey && this.tracer) {
+        llmConfig.callbacks = [this.tracer];
+      }
+
+      console.log('LangGraphAgent: Creating LLM with config:', {
+        apiKey: this.apiKey ? '***' + this.apiKey.slice(-4) : 'missing',
+        model: llmConfig.model
       });
+
+      let llm;
+      try {
+        llm = new ChatOpenAI(llmConfig);
+        console.log('LangGraphAgent: LLM created successfully');
+      } catch (llmCreateError) {
+        console.error('LangGraphAgent: Failed to create LLM:', llmCreateError);
+        throw new Error(`Failed to create LLM: ${llmCreateError.message}`);
+      }
 
       // Test the LLM first
       console.log('LangGraphAgent: Testing LLM connection...');
@@ -74,14 +123,15 @@ export class LangGraphAgent {
       // Set up LangSmith tracer if API key is provided
       if (this.langsmithApiKey) {
         try {
-          this.tracer = {
+          console.log('LangGraphAgent: Initializing LangSmith tracer...');
+          this.tracer = new LangChainTracer({
             projectName: this.langsmithProject,
             client: new Client({
               apiUrl: "https://api.smith.langchain.com",
               apiKey: this.langsmithApiKey,
             }),
-          };
-          console.log('LangGraphAgent: LangSmith tracer initialized');
+          });
+          console.log('LangGraphAgent: LangSmith tracer initialized successfully');
         } catch (error) {
           console.warn('LangGraphAgent: Failed to initialize LangSmith tracer:', error);
           this.tracer = null;
@@ -109,7 +159,7 @@ export class LangGraphAgent {
           llm: llm,
           tools: [mermaidTool], // Include Mermaid diagram tool
           prompt: "you are a mermaid diagram agent and have access to mermaid diagram tool. \
-          You take mermaid code and render it into a diagram in HTML format.",
+          You take mermaid code and render it into a diagram in HTML and only return valid HTML.",
         });
           console.log('LangGraphAgent: Agent executor created successfully');
 
@@ -185,6 +235,7 @@ export class LangGraphAgent {
           if (this.tracer) {
             invokeOptions.callbacks = [this.tracer];
           }
+          invokeOptions.verbose = true;
           
           console.log('LangGraphAgent: Invoking agent with options:', invokeOptions);
           result = await this.supervisor.invoke(invokeOptions);
@@ -192,18 +243,28 @@ export class LangGraphAgent {
           console.warn('LangGraphAgent: Standard invoke failed, trying alternative method:', invokeError);
         }
       } else {
-        // Agent is null, use LLM directly
-        console.log('LangGraphAgent: Using LLM directly (agent is null)');
-        const llm = new ChatOpenAI({
-          openAIApiKey: this.apiKey,
-          modelName: 'gpt-3.5-turbo',
-          temperature: 0.7,
-          maxTokens: 1000
-        });
-        
-        const llmResult = await llm.invoke([new HumanMessage(contextualMessage)]);
-        result = { output: llmResult.content };
+        console.error('LangGraphAgent: Using LLM directly (agent is null)');
       }
+      
+    //   else {
+    //     // Agent is null, use LLM directly
+    //     console.log('LangGraphAgent: Using LLM directly (agent is null)');
+    //     const llmConfig = {
+    //       openAIApiKey: this.apiKey,
+    //       modelName: 'gpt-3.5-turbo',
+    //       temperature: 0.7,
+    //       maxTokens: 1000
+    //     };
+        
+    //     // Add tracer if available
+    //     if (this.tracer) {
+    //       llmConfig.callbacks = [this.tracer];
+    //     }
+        
+    //     const llm = new ChatOpenAI(llmConfig);
+    //     const llmResult = await llm.invoke([new HumanMessage(contextualMessage)]);
+    //     result = { output: llmResult.content };
+    //   }
 
       // Extract the response - handle different result formats
       let response;
@@ -214,18 +275,28 @@ export class LangGraphAgent {
       } else if (result && typeof result === 'string') {
         response = result;
       } else {
-        // Fallback: use the LLM directly
-        console.log('LangGraphAgent: Falling back to direct LLM call');
-        const llm = new ChatOpenAI({
-          openAIApiKey: this.apiKey,
-          modelName: 'gpt-3.5-turbo',
-          temperature: 0.7,
-          maxTokens: 1000
-        });
-        
-        const llmResult = await llm.invoke([new HumanMessage(contextualMessage)]);
-        response = llmResult.content;
+        console.error('LangGraphAgent: No response from agent');
       }
+      
+    //   else {
+    //     // Fallback: use the LLM directly
+    //     console.log('LangGraphAgent: Falling back to direct LLM call');
+    //     const llmConfig = {
+    //       openAIApiKey: this.apiKey,
+    //       modelName: 'gpt-3.5-turbo',
+    //       temperature: 0.7,
+    //       maxTokens: 1000
+    //     };
+        
+    //     // Add tracer if available
+    //     if (this.tracer) {
+    //       llmConfig.callbacks = [this.tracer];
+    //     }
+        
+    //     const llm = new ChatOpenAI(llmConfig);
+    //     const llmResult = await llm.invoke([new HumanMessage(contextualMessage)]);
+    //     response = llmResult.content;
+    //   }
 
       console.log('LangGraphAgent: Received response:', response);
 
@@ -241,31 +312,37 @@ export class LangGraphAgent {
       console.error('LangGraphAgent: Error processing message:', error);
       
       // Fallback to simple LLM call if agent fails
-      try {
-        console.log('LangGraphAgent: Attempting fallback LLM call');
-        const llm = new ChatOpenAI({
-          openAIApiKey: this.apiKey,
-          modelName: 'gpt-3.5-turbo',
-          temperature: 0.7,
-          maxTokens: 1000
-        });
+    //   try {
+    //     console.log('LangGraphAgent: Attempting fallback LLM call');
+    //     const llmConfig = {
+    //       openAIApiKey: this.apiKey,
+    //       modelName: 'gpt-3.5-turbo',
+    //       temperature: 0.7,
+    //       maxTokens: 1000
+    //     };
         
-        const contextualMessage = this.createContextualMessage(userMessage);
-        const llmResult = await llm.invoke([new HumanMessage(contextualMessage)]);
-        const response = llmResult.content;
+    //     // Add tracer if available
+    //     if (this.tracer) {
+    //       llmConfig.callbacks = [this.tracer];
+    //     }
         
-        // Add response to conversation history
-        this.conversationHistory.push({
-          role: 'assistant',
-          content: response,
-          timestamp: new Date().toISOString()
-        });
+    //     const llm = new ChatOpenAI(llmConfig);
+    //     const contextualMessage = this.createContextualMessage(userMessage);
+    //     const llmResult = await llm.invoke([new HumanMessage(contextualMessage)]);
+    //     const response = llmResult.content;
         
-        return response;
-      } catch (fallbackError) {
-        console.error('LangGraphAgent: Fallback also failed:', fallbackError);
-        throw new Error(`Agent processing failed: ${error.message}. Fallback also failed: ${fallbackError.message}`);
-      }
+    //     // Add response to conversation history
+    //     this.conversationHistory.push({
+    //       role: 'assistant',
+    //       content: response,
+    //       timestamp: new Date().toISOString()
+    //     });
+        
+    //     return response;
+    //   } catch (fallbackError) {
+    //     console.error('LangGraphAgent: Fallback also failed:', fallbackError);
+    //     throw new Error(`Agent processing failed: ${error.message}. Fallback also failed: ${fallbackError.message}`);
+    //   }
     }
   }
 

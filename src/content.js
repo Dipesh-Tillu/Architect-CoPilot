@@ -282,7 +282,9 @@ class BrowserAssistant {
     } else {
       // Render markdown for assistant messages, plain text for user messages
       if (sender === 'assistant') {
+        console.log('Content script: Content before rendering:', content);
         messageDiv.innerHTML = this.renderMarkdown(content);
+        console.log('Content script: Rendered markdown for assistant:', messageDiv.innerHTML);
       } else {
         messageDiv.textContent = content;
       }
@@ -296,9 +298,34 @@ class BrowserAssistant {
   renderMarkdown(text) {
     if (!text) return '';
     
+    // console.log('Content script: Rendering markdown:', text);
+
+    // Check if this is HTML content wrapped in markdown code blocks
+    const htmlCodeBlockMatch = text.match(/```html\s*([\s\S]*?)\s*```/);
+    if (htmlCodeBlockMatch) {
+      // Extract HTML content from code block and return it directly
+      console.log('Content script: Detected HTML code block, rendering as HTML');
+      // console.log('Content script: HTML code block:', htmlCodeBlockMatch[1].trim());
+      return htmlCodeBlockMatch[1].trim();
+    }
+    
+    // Check for other code block formats that might contain HTML
+    const codeBlockMatch = text.match(/```\s*([\s\S]*?)\s*```/);
+    if (codeBlockMatch) {
+      const codeContent = codeBlockMatch[1].trim();
+      // Check if the code content looks like HTML
+      if (codeContent.includes('<div') || codeContent.includes('<script') || 
+          codeContent.includes('<html') || codeContent.includes('<!DOCTYPE') ||
+          codeContent.includes('<svg') || codeContent.includes('class=')) {
+        console.log('Content script: Detected HTML in code block, rendering as HTML');
+        return codeContent;
+      }
+    }
+    
     // Check if this is HTML content (like from Mermaid tool)
-    if (text.includes('<div class="mermaid-diagram">') || text.includes('<script>')) {
+    if (text.includes('<div class="mermaid-diagram">') || text.includes('<script>') || text.includes('<html>') || text.includes('<!DOCTYPE')) {
       // This is HTML content, return it directly without escaping
+      console.log('Content script: Detected HTML content, rendering as HTML');
       return text;
     }
     

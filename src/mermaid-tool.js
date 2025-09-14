@@ -95,7 +95,8 @@ export class MermaidDiagramTool extends Tool {
           }
         </script>
       `;
-
+      console.log('MermaidDiagramTool: Mermaid HTML created successfully');
+      console.log('MermaidDiagramTool: Mermaid HTML:', mermaidHtml);
       return mermaidHtml;
       
     } catch (error) {

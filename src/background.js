@@ -159,6 +159,13 @@ Keep the response concise and helpful.`;
           return await this.simpleChatResponse(message, pageData);
         }
         
+        console.log('LangGraphAssistant: Creating agent with params:', {
+          apiKey: this.apiKey ? '***' + this.apiKey.slice(-4) : 'missing',
+          baseUrl: this.baseUrl,
+          langsmithApiKey: this.langsmithApiKey ? '***' + this.langsmithApiKey.slice(-4) : 'missing',
+          langsmithProject: this.langsmithProject
+        });
+        
         agent = new LangGraphAgent(this.apiKey, this.baseUrl, this.langsmithApiKey, this.langsmithProject);
         await agent.initialize(pageData, threadId);
         this.agents.set(threadId, agent);
