@@ -1,0 +1,113 @@
+<div class="mermaid-diagram" id="mermaid-1757885851775-moouly44z">
+  <div class="mermaid-code">
+    <pre><code>flowchart TD;
+    A[Start] --&gt; B[Real-Time Data Processing];
+    B --&gt;|Expensive| C[Batch Processing];
+    B --&gt;|Compelling Use Case| D[Implement Real-Time Pipeline];
+    D --&gt; E[Technologies Used];
+    E --&gt; F[Kafka];
+    E --&gt; G[Kinesis];
+    E --&gt; H[Python Optimizations];
+    C --&gt; I[Cost Considerations];
+    I --&gt; J[Shift Back to Batch Processing];
+    J --&gt; K[Community Learning];
+    K --&gt; L[Share Experiences];
+    L --&gt; M[End];
+    D --&gt; N[Specific Use Cases];
+    N --&gt; O[IoT Devices for Manufacturing];</code></pre>
+  </div>
+  <div class="mermaid-container">
+    <div class="mermaid" id="mermaid-1757885851775-moouly44z-render">flowchart TD;
+    A[Start] --&gt; B[Real-Time Data Processing];
+    B --&gt;|Expensive| C[Batch Processing];
+    B --&gt;|Compelling Use Case| D[Implement Real-Time Pipeline];
+    D --&gt; E[Technologies Used];
+    E --&gt; F[Kafka];
+    E --&gt; G[Kinesis];
+    E --&gt; H[Python Optimizations];
+    C --&gt; I[Cost Considerations];
+    I --&gt; J[Shift Back to Batch Processing];
+    J --&gt; K[Community Learning];
+    K --&gt; L[Share Experiences];
+    L --&gt; M[End];
+    D --&gt; N[Specific Use Cases];
+    N --&gt; O[IoT Devices for Manufacturing];</div>
+  </div>
+</div>
+<script>
+  // Load Mermaid.js if not already loaded
+  if (typeof mermaid === 'undefined') {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js';
+    script.onload = function() {
+      mermaid.initialize({ 
+        startOnLoad: false,
+        theme: 'default',
+        themeVariables: {
+          primaryColor: '#007bff',
+          primaryTextColor: '#333',
+          primaryBorderColor: '#007bff',
+          lineColor: '#333',
+          secondaryColor: '#f8f9fa',
+          tertiaryColor: '#fff'
+        }
+      });
+      // Render the specific diagram
+      mermaid.render('mermaid-1757885851775-moouly44z-svg', `flowchart TD;
+    A[Start] --> B[Real-Time Data Processing];
+    B -->|Expensive| C[Batch Processing];
+    B -->|Compelling Use Case| D[Implement Real-Time Pipeline];
+    D --> E[Technologies Used];
+    E --> F[Kafka];
+    E --> G[Kinesis];
+    E --> H[Python Optimizations];
+    C --> I[Cost Considerations];
+    I --> J[Shift Back to Batch Processing];
+    J --> K[Community Learning];
+    K --> L[Share Experiences];
+    L --> M[End];
+    D --> N[Specific Use Cases];
+    N --> O[IoT Devices for Manufacturing];`).then(({svg}) => {
+          const container = document.getElementById('mermaid-1757885851775-moouly44z-render');
+          if (container) {
+            container.innerHTML = svg;
+          }
+        }).catch(err => {
+          console.error('Mermaid rendering error:', err);
+          const container = document.getElementById('mermaid-1757885851775-moouly44z-render');
+          if (container) {
+            container.innerHTML = '<div class="mermaid-error">Error rendering diagram: ' + err.message + '</div>';
+          }
+        });
+    };
+    document.head.appendChild(script);
+  } else {
+    // Mermaid is already loaded, render immediately
+    mermaid.render('mermaid-1757885851775-moouly44z-svg', `flowchart TD;
+    A[Start] --> B[Real-Time Data Processing];
+    B -->|Expensive| C[Batch Processing];
+    B -->|Compelling Use Case| D[Implement Real-Time Pipeline];
+    D --> E[Technologies Used];
+    E --> F[Kafka];
+    E --> G[Kinesis];
+    E --> H[Python Optimizations];
+    C --> I[Cost Considerations];
+    I --> J[Shift Back to Batch Processing];
+    J --> K[Community Learning];
+    K --> L[Share Experiences];
+    L --> M[End];
+    D --> N[Specific Use Cases];
+    N --> O[IoT Devices for Manufacturing];`).then(({svg}) => {
+          const container = document.getElementById('mermaid-1757885851775-moouly44z-render');
+          if (container) {
+            container.innerHTML = svg;
+          }
+        }).catch(err => {
+          console.error('Mermaid rendering error:', err);
+          const container = document.getElementById('mermaid-1757885851775-moouly44z-render');
+          if (container) {
+            container.innerHTML = '<div class="mermaid-error">Error rendering diagram: ' + err.message + '</div>';
+          }
+        });
+  }
+</script>
