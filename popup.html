@@ -128,13 +128,24 @@
       <input type="text" id="baseUrl" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1">
     </div>
     
+    <div class="input-group">
+      <label for="langsmithApiKey">LangSmith API Key (optional):</label>
+      <input type="password" id="langsmithApiKey" placeholder="Enter your LangSmith API key">
+    </div>
+    
+    <div class="input-group">
+      <label for="langsmithProject">LangSmith Project (optional):</label>
+      <input type="text" id="langsmithProject" placeholder="browser-assistant" value="browser-assistant">
+    </div>
+    
     <div class="button-group">
       <button id="saveConfig" class="primary">Save</button>
       <button id="testConfig" class="secondary">Test</button>
     </div>
     
     <div class="help-text">
-      Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
+      Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a><br>
+      Get your LangSmith API key from <a href="https://smith.langchain.com/" target="_blank">LangSmith</a>
     </div>
   </div>
   

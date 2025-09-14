@@ -13,12 +13,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadConfig() {
   try {
-    const result = await chrome.storage.sync.get(['apiKey', 'baseUrl']);
+    const result = await chrome.storage.sync.get(['apiKey', 'baseUrl', 'langsmithApiKey', 'langsmithProject']);
     if (result.apiKey) {
       document.getElementById('apiKey').value = result.apiKey;
     }
     if (result.baseUrl) {
       document.getElementById('baseUrl').value = result.baseUrl;
+    }
+    if (result.langsmithApiKey) {
+      document.getElementById('langsmithApiKey').value = result.langsmithApiKey;
+    }
+    if (result.langsmithProject) {
+      document.getElementById('langsmithProject').value = result.langsmithProject;
     }
   } catch (error) {
     console.error('Error loading config:', error);
@@ -29,6 +35,8 @@ async function loadConfig() {
 async function saveConfig() {
   const apiKey = document.getElementById('apiKey').value.trim();
   const baseUrl = document.getElementById('baseUrl').value.trim();
+  const langsmithApiKey = document.getElementById('langsmithApiKey').value.trim();
+  const langsmithProject = document.getElementById('langsmithProject').value.trim();
   
   if (!apiKey) {
     showStatus('Please enter an API key', 'error');
@@ -47,7 +55,9 @@ async function saveConfig() {
     const response = await chrome.runtime.sendMessage({
       action: 'setApiKey',
       apiKey: apiKey,
-      baseUrl: baseUrl
+      baseUrl: baseUrl,
+      langsmithApiKey: langsmithApiKey,
+      langsmithProject: langsmithProject
     });
     
     console.log('Save config response:', response);

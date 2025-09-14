@@ -2,16 +2,26 @@
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage } from "@langchain/core/messages";
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
+import { MermaidDiagramTool } from "./mermaid-tool.js";
+import { StateGraph, MessagesAnnotation } from "@langchain/langgraph/web";
+import { Client } from "langsmith";
 
 export class LangGraphAgent {
-  constructor(apiKey, baseUrl = 'https://api.openai.com/v1') {
+  constructor(apiKey, 
+    baseUrl = 'https://api.openai.com/v1',
+    langsmithApiKey = null,
+    langsmithProject = 'browser-assistant') {
     this.apiKey = apiKey;
     this.baseUrl = baseUrl;
+    this.langsmithApiKey = langsmithApiKey;
+    this.langsmithProject = langsmithProject;
     this.conversationHistory = [];
     this.pageContext = null;
     this.threadId = null;
-    this.agent = null;
+    this.mermaidDiagramAgent = null;
+    this.supervisor = null;
     this.initialized = false;
+    this.tracer = null;
   }
 
   // Initialize the agent with page context
@@ -61,22 +71,74 @@ export class LangGraphAgent {
         throw new Error(`LLM connection failed: ${llmError.message}`);
       }
 
+      // Set up LangSmith tracer if API key is provided
+      if (this.langsmithApiKey) {
+        try {
+          this.tracer = {
+            projectName: this.langsmithProject,
+            client: new Client({
+              apiUrl: "https://api.smith.langchain.com",
+              apiKey: this.langsmithApiKey,
+            }),
+          };
+          console.log('LangGraphAgent: LangSmith tracer initialized');
+        } catch (error) {
+          console.warn('LangGraphAgent: Failed to initialize LangSmith tracer:', error);
+          this.tracer = null;
+        }
+      } else {
+        this.tracer = null;
+        console.log('LangGraphAgent: LangSmith tracing disabled (no API key)');
+      }
+
+    // create react agent for summerize the content
+    this.summerizeAgent = createReactAgent({
+      llm: llm,
+      tools: [],
+      prompt: "you are a summerize agent and have access to the content of the page. \
+      You summerize the content of the page to highlight the most important architecture and design patterns.",
+    });
+    console.log('LangGraphAgent: Summerize agent created successfully');
+
       // Create the agent executor with error handling
       try {
         // Try to create a simple agent without complex configuration
         // First check if the LLM has the required methods
-          this.agent = createReactAgent({
-            llm: llm,
-            tools: [] // We'll add tools later if needed
-          });
+        const mermaidTool = new MermaidDiagramTool();
+        this.mermaidDiagramAgent = createReactAgent({
+          llm: llm,
+          tools: [mermaidTool], // Include Mermaid diagram tool
+          prompt: "you are a mermaid diagram agent and have access to mermaid diagram tool. \
+          You take mermaid code and render it into a diagram in HTML format.",
+        });
           console.log('LangGraphAgent: Agent executor created successfully');
 
       } catch (agentError) {
         console.error('LangGraphAgent: Failed to create agent executor:', agentError);
         // If agent creation fails, we'll use the LLM directly
         console.log('LangGraphAgent: Will use LLM directly instead of agent executor');
-        this.agent = null; // We'll handle this in processMessage
+        this.mermaidDiagramAgent = null; // We'll handle this in processMessage
       }
+
+      // Create the supervisor
+
+    //   workflow = createSupervisor({
+    //     agents: [this.mermaidDiagramAgent],
+    //     llm: llm,
+    //     prompt: "you are a browser assistant supervisor agent and have access to mermaid code agent and mermaid diagram agent. \
+    //     For creating mermaid code from browser content, use the mermaid code agent. \
+    //     For rendering the mermaid code, use the mermaid diagram agent.",
+    //   });
+
+      this.workflow = new StateGraph(MessagesAnnotation)
+        .addNode("mermaid_diagram_agent", this.mermaidDiagramAgent)
+        .addNode("summerize_agent", this.summerizeAgent)
+        .addEdge("__start__", "summerize_agent")
+        .addEdge("summerize_agent", "mermaid_diagram_agent")
+        .addEdge("mermaid_diagram_agent", "__end__");
+
+      this.supervisor = this.workflow.compile();
+      console.log('LangGraphAgent: Supervisor created successfully');
 
       this.initialized = true;
       console.log('LangGraphAgent: Agent setup complete');
@@ -112,12 +174,20 @@ export class LangGraphAgent {
       console.log('LangGraphAgent: Invoking agent with message:', contextualMessage);
       
       let result;
-      if (this.agent) {
+      if (this.supervisor) {
         try {
           // First try the standard invoke method
-          result = await this.agent.invoke({
+          const invokeOptions = {
             messages: [new HumanMessage(contextualMessage)]
-          });
+          };
+          
+          // Add tracer if available
+          if (this.tracer) {
+            invokeOptions.callbacks = [this.tracer];
+          }
+          
+          console.log('LangGraphAgent: Invoking agent with options:', invokeOptions);
+          result = await this.supervisor.invoke(invokeOptions);
         } catch (invokeError) {
           console.warn('LangGraphAgent: Standard invoke failed, trying alternative method:', invokeError);
         }

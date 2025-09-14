@@ -280,11 +280,65 @@ class BrowserAssistant {
         </div>
       `;
     } else {
-      messageDiv.textContent = content;
+      // Render markdown for assistant messages, plain text for user messages
+      if (sender === 'assistant') {
+        messageDiv.innerHTML = this.renderMarkdown(content);
+      } else {
+        messageDiv.textContent = content;
+      }
     }
 
     chatContainer.appendChild(messageDiv);
     chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
+
+  // Simple markdown renderer
+  renderMarkdown(text) {
+    if (!text) return '';
+    
+    // Check if this is HTML content (like from Mermaid tool)
+    if (text.includes('<div class="mermaid-diagram">') || text.includes('<script>')) {
+      // This is HTML content, return it directly without escaping
+      return text;
+    }
+    
+    // Escape HTML first for regular markdown content
+    let html = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    
+    // Convert markdown to HTML
+    html = html
+      // Headers
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      // Bold
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/__(.*?)__/g, '<strong>$1</strong>')
+      // Italic
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/_(.*?)_/g, '<em>$1</em>')
+      // Code blocks
+      .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      // Links
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+      // Line breaks
+      .replace(/\n/g, '<br>')
+      // Lists
+      .replace(/^\* (.*$)/gim, '<li>$1</li>')
+      .replace(/^- (.*$)/gim, '<li>$1</li>')
+      .replace(/^\d+\. (.*$)/gim, '<li>$1</li>');
+    
+    // Wrap consecutive list items in ul/ol
+    html = html.replace(/(<li>.*<\/li>)/g, (match) => {
+      if (match.includes('<ul>') || match.includes('<ol>')) return match;
+      return '<ul>' + match + '</ul>';
+    });
+    
+    return html;
   }
 }
 

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Mermaid System Test - Browser Assistant</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .example {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .agent-flow {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid #2196f3;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        .step-number {
+            background: #007bff;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Multi-Agent Mermaid System Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 System Overview</h2>
+        <p>The multi-agent system consists of two specialized agents working together:</p>
+        
+        <div class="agent-flow">
+            <div class="flow-step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Mermaid Code Generator Agent</strong><br>
+                    <small>Analyzes user requirements and generates appropriate Mermaid diagram code</small>
+                </div>
+            </div>
+            <div class="flow-step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Mermaid Diagram Renderer Agent</strong><br>
+                    <small>Takes the generated code and creates the visual HTML diagram</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Test Instructions</h2>
+        <ol>
+            <li>Load the Browser Assistant extension</li>
+            <li>Open the assistant panel (click the extension icon)</li>
+            <li>Try the example prompts below</li>
+            <li>Observe the two-step process: code generation → diagram rendering</li>
+            <li>Check that both agents work together seamlessly</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Prompts</h2>
+        
+        <div class="example">
+            <h3>1. Flowchart Generation</h3>
+            <p><strong>Prompt:</strong> "Create a flowchart showing the user registration process"</p>
+            <p><strong>Expected Flow:</strong></p>
+            <ul>
+                <li>Agent 1: Generates flowchart Mermaid code</li>
+                <li>Agent 2: Renders the code into visual diagram</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h3>2. Sequence Diagram Generation</h3>
+            <p><strong>Prompt:</strong> "Draw a sequence diagram for a login process between user, frontend, and backend"</p>
+            <p><strong>Expected Flow:</strong></p>
+            <ul>
+                <li>Agent 1: Generates sequence diagram Mermaid code</li>
+                <li>Agent 2: Renders the code into visual diagram</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h3>3. Class Diagram Generation</h3>
+            <p><strong>Prompt:</strong> "Create a class diagram for a User class with properties and methods"</p>
+            <p><strong>Expected Flow:</strong></p>
+            <ul>
+                <li>Agent 1: Generates class diagram Mermaid code</li>
+                <li>Agent 2: Renders the code into visual diagram</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h3>4. State Diagram Generation</h3>
+            <p><strong>Prompt:</strong> "Show the states of an order: pending, confirmed, shipped, delivered"</p>
+            <p><strong>Expected Flow:</strong></p>
+            <ul>
+                <li>Agent 1: Generates state diagram Mermaid code</li>
+                <li>Agent 2: Renders the code into visual diagram</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h3>5. ER Diagram Generation</h3>
+            <p><strong>Prompt:</strong> "Create an entity relationship diagram for a blog system with users, posts, and comments"</p>
+            <p><strong>Expected Flow:</strong></p>
+            <ul>
+                <li>Agent 1: Generates ER diagram Mermaid code</li>
+                <li>Agent 2: Renders the code into visual diagram</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Direct Agent Testing</h2>
+        <p>You can also test individual agents by providing specific inputs:</p>
+        
+        <div class="example">
+            <h3>Test Code Generator Agent</h3>
+            <p><strong>Input:</strong> "Create a flowchart for a decision tree"</p>
+            <p><strong>Expected:</strong> Should return Mermaid flowchart code</p>
+        </div>
+
+        <div class="example">
+            <h3>Test Diagram Renderer Agent</h3>
+            <p><strong>Input:</strong> Raw Mermaid code (e.g., <code>graph TD; A-->B</code>)</p>
+            <p><strong>Expected:</strong> Should render the code into a visual diagram</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ Expected Features</h2>
+        <ul>
+            <li>✅ <strong>Two-Agent Workflow</strong>: Clear separation between code generation and rendering</li>
+            <li>✅ <strong>Specialized Agents</strong>: Each agent has a specific role and expertise</li>
+            <li>✅ <strong>Seamless Integration</strong>: Agents work together transparently</li>
+            <li>✅ <strong>Code Generation</strong>: Agent 1 creates appropriate Mermaid code</li>
+            <li>✅ <strong>Visual Rendering</strong>: Agent 2 creates actual SVG diagrams</li>
+            <li>✅ <strong>Error Handling</strong>: Each agent handles its own errors gracefully</li>
+            <li>✅ <strong>Loading States</strong>: Visual feedback during diagram rendering</li>
+            <li>✅ <strong>Copy Functionality</strong>: Users can copy generated Mermaid code</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🔍 Debugging Multi-Agent System</h2>
+        <p>To debug the multi-agent system:</p>
+        <ol>
+            <li><strong>Check Console Logs</strong>: Look for agent-specific log messages</li>
+            <li><strong>Verify Agent Flow</strong>: Ensure both agents are being called</li>
+            <li><strong>Test Individual Agents</strong>: Test each agent separately</li>
+            <li><strong>Check Tool Integration</strong>: Verify tools are properly registered</li>
+            <li><strong>Monitor Performance</strong>: Check for any performance issues</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>🐛 Troubleshooting</h2>
+        <p>If the multi-agent system isn't working:</p>
+        <ol>
+            <li>Check browser console for agent-specific errors</li>
+            <li>Verify the extension is loaded and active</li>
+            <li>Try reloading the page and extension</li>
+            <li>Test with simple prompts first</li>
+            <li>Check that both agents are properly initialized</li>
+        </ol>
+    </div>
+
+    <script>
+        console.log('Multi-Agent Mermaid System Test Page Loaded');
+        console.log('Load the Browser Assistant extension and test the multi-agent prompts above');
+        console.log('Watch for agent-specific log messages in the console');
+    </script>
+</body>
+</html>

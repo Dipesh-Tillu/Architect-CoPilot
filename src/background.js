@@ -7,6 +7,8 @@ class LangGraphAssistant {
   constructor() {
     this.apiKey = null;
     this.baseUrl = 'https://api.openai.com/v1'; // Default to OpenAI, can be configured
+    this.langsmithApiKey = null; // LangSmith API key for tracing
+    this.langsmithProject = 'browser-assistant'; // LangSmith project name
     this.agents = new Map(); // Store agents by thread ID
     this.initialized = false;
     this.init();
@@ -35,12 +37,19 @@ class LangGraphAssistant {
 
   async loadApiKey() {
     try {
-      const result = await chrome.storage.sync.get(['apiKey', 'baseUrl']);
+      const result = await chrome.storage.sync.get(['apiKey', 'baseUrl', 'langsmithApiKey', 'langsmithProject']);
       this.apiKey = result.apiKey;
       if (result.baseUrl) {
         this.baseUrl = result.baseUrl;
       }
+      if (result.langsmithApiKey) {
+        this.langsmithApiKey = result.langsmithApiKey;
+      }
+      if (result.langsmithProject) {
+        this.langsmithProject = result.langsmithProject;
+      }
       console.log('LangGraphAssistant: API key loaded:', this.apiKey ? 'Yes' : 'No');
+      console.log('LangGraphAssistant: LangSmith API key loaded:', this.langsmithApiKey ? 'Yes' : 'No');
     } catch (error) {
       console.error('LangGraphAssistant: Failed to load API key:', error);
     }
@@ -70,7 +79,7 @@ class LangGraphAssistant {
         
         case 'setApiKey':
           try {
-            await this.setApiKey(request.apiKey, request.baseUrl);
+            await this.setApiKey(request.apiKey, request.baseUrl, request.langsmithApiKey, request.langsmithProject);
             sendResponse({ success: true });
           } catch (error) {
             console.error('Error setting API key:', error);
@@ -150,7 +159,7 @@ Keep the response concise and helpful.`;
           return await this.simpleChatResponse(message, pageData);
         }
         
-        agent = new LangGraphAgent(this.apiKey, this.baseUrl);
+        agent = new LangGraphAgent(this.apiKey, this.baseUrl, this.langsmithApiKey, this.langsmithProject);
         await agent.initialize(pageData, threadId);
         this.agents.set(threadId, agent);
         console.log('LangGraphAssistant: Created new agent for thread:', threadId);
@@ -212,22 +221,35 @@ Please provide a helpful response based on the webpage content and the user's qu
     return data.choices[0].message.content;
   }
 
-  async setApiKey(apiKey, baseUrl) {
+  async setApiKey(apiKey, baseUrl, langsmithApiKey, langsmithProject) {
     try {
-      console.log('Setting API key:', { apiKey: apiKey ? '***' + apiKey.slice(-4) : 'empty', baseUrl });
+      console.log('Setting API key:', { 
+        apiKey: apiKey ? '***' + apiKey.slice(-4) : 'empty', 
+        baseUrl,
+        langsmithApiKey: langsmithApiKey ? '***' + langsmithApiKey.slice(-4) : 'empty',
+        langsmithProject
+      });
       
       this.apiKey = apiKey;
       if (baseUrl) {
         this.baseUrl = baseUrl;
       }
+      if (langsmithApiKey) {
+        this.langsmithApiKey = langsmithApiKey;
+      }
+      if (langsmithProject) {
+        this.langsmithProject = langsmithProject;
+      }
       
       // Save to Chrome storage
       await chrome.storage.sync.set({
         apiKey: apiKey,
-        baseUrl: baseUrl || this.baseUrl
+        baseUrl: baseUrl || this.baseUrl,
+        langsmithApiKey: langsmithApiKey || this.langsmithApiKey,
+        langsmithProject: langsmithProject || this.langsmithProject
       });
       
-      console.log('API key saved successfully');
+      console.log('API key and LangSmith settings saved successfully');
     } catch (error) {
       console.error('Error in setApiKey:', error);
       throw new Error(`Failed to save API key: ${error.message}`);
