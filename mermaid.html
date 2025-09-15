@@ -1,37 +1,33 @@
-<div class="mermaid-diagram" id="mermaid-1757885851775-moouly44z">
+<div class="mermaid-diagram" id="mermaid-1757893841798-hin2899fx">
   <div class="mermaid-code">
     <pre><code>flowchart TD;
-    A[Start] --&gt; B[Real-Time Data Processing];
-    B --&gt;|Expensive| C[Batch Processing];
-    B --&gt;|Compelling Use Case| D[Implement Real-Time Pipeline];
-    D --&gt; E[Technologies Used];
-    E --&gt; F[Kafka];
-    E --&gt; G[Kinesis];
-    E --&gt; H[Python Optimizations];
-    C --&gt; I[Cost Considerations];
-    I --&gt; J[Shift Back to Batch Processing];
-    J --&gt; K[Community Learning];
-    K --&gt; L[Share Experiences];
-    L --&gt; M[End];
-    D --&gt; N[Specific Use Cases];
-    N --&gt; O[IoT Devices for Manufacturing];</code></pre>
+    A[Start] --> B[Identify Data Source];
+    B -->|IoT Devices| C[Choose Data Ingestion Method];
+    B -->|Batch Data| C;
+    C -->|Real-time| D[Process Data with Kafka/Kinesis];
+    C -->|Batch| E[Process Data with ETL];
+    D --> F[Store Data in Data Warehouse];
+    E --> F;
+    F --> G[Create Dashboards];
+    G --> H[Evaluate Use Cases];
+    H -->|Fraud Detection| I[Address Challenges];
+    H -->|Business Insights| I;
+    I --> J[End];</code></pre>
   </div>
   <div class="mermaid-container">
-    <div class="mermaid" id="mermaid-1757885851775-moouly44z-render">flowchart TD;
-    A[Start] --&gt; B[Real-Time Data Processing];
-    B --&gt;|Expensive| C[Batch Processing];
-    B --&gt;|Compelling Use Case| D[Implement Real-Time Pipeline];
-    D --&gt; E[Technologies Used];
-    E --&gt; F[Kafka];
-    E --&gt; G[Kinesis];
-    E --&gt; H[Python Optimizations];
-    C --&gt; I[Cost Considerations];
-    I --&gt; J[Shift Back to Batch Processing];
-    J --&gt; K[Community Learning];
-    K --&gt; L[Share Experiences];
-    L --&gt; M[End];
-    D --&gt; N[Specific Use Cases];
-    N --&gt; O[IoT Devices for Manufacturing];</div>
+    <div class="mermaid" id="mermaid-1757893841798-hin2899fx-render">flowchart TD;
+    A[Start] --> B[Identify Data Source];
+    B -->|IoT Devices| C[Choose Data Ingestion Method];
+    B -->|Batch Data| C;
+    C -->|Real-time| D[Process Data with Kafka/Kinesis];
+    C -->|Batch| E[Process Data with ETL];
+    D --> F[Store Data in Data Warehouse];
+    E --> F;
+    F --> G[Create Dashboards];
+    G --> H[Evaluate Use Cases];
+    H -->|Fraud Detection| I[Address Challenges];
+    H -->|Business Insights| I;
+    I --> J[End];</div>
   </div>
 </div>
 <script>
@@ -53,28 +49,26 @@
         }
       });
       // Render the specific diagram
-      mermaid.render('mermaid-1757885851775-moouly44z-svg', `flowchart TD;
-    A[Start] --> B[Real-Time Data Processing];
-    B -->|Expensive| C[Batch Processing];
-    B -->|Compelling Use Case| D[Implement Real-Time Pipeline];
-    D --> E[Technologies Used];
-    E --> F[Kafka];
-    E --> G[Kinesis];
-    E --> H[Python Optimizations];
-    C --> I[Cost Considerations];
-    I --> J[Shift Back to Batch Processing];
-    J --> K[Community Learning];
-    K --> L[Share Experiences];
-    L --> M[End];
-    D --> N[Specific Use Cases];
-    N --> O[IoT Devices for Manufacturing];`).then(({svg}) => {
-          const container = document.getElementById('mermaid-1757885851775-moouly44z-render');
+      mermaid.render('mermaid-1757893841798-hin2899fx-svg', `flowchart TD;
+    A[Start] --> B[Identify Data Source];
+    B -->|IoT Devices| C[Choose Data Ingestion Method];
+    B -->|Batch Data| C;
+    C -->|Real-time| D[Process Data with Kafka/Kinesis];
+    C -->|Batch| E[Process Data with ETL];
+    D --> F[Store Data in Data Warehouse];
+    E --> F;
+    F --> G[Create Dashboards];
+    G --> H[Evaluate Use Cases];
+    H -->|Fraud Detection| I[Address Challenges];
+    H -->|Business Insights| I;
+    I --> J[End];`).then(({svg}) => {
+          const container = document.getElementById('mermaid-1757893841798-hin2899fx-render');
           if (container) {
             container.innerHTML = svg;
           }
         }).catch(err => {
           console.error('Mermaid rendering error:', err);
-          const container = document.getElementById('mermaid-1757885851775-moouly44z-render');
+          const container = document.getElementById('mermaid-1757893841798-hin2899fx-render');
           if (container) {
             container.innerHTML = '<div class="mermaid-error">Error rendering diagram: ' + err.message + '</div>';
           }
@@ -83,28 +77,26 @@
     document.head.appendChild(script);
   } else {
     // Mermaid is already loaded, render immediately
-    mermaid.render('mermaid-1757885851775-moouly44z-svg', `flowchart TD;
-    A[Start] --> B[Real-Time Data Processing];
-    B -->|Expensive| C[Batch Processing];
-    B -->|Compelling Use Case| D[Implement Real-Time Pipeline];
-    D --> E[Technologies Used];
-    E --> F[Kafka];
-    E --> G[Kinesis];
-    E --> H[Python Optimizations];
-    C --> I[Cost Considerations];
-    I --> J[Shift Back to Batch Processing];
-    J --> K[Community Learning];
-    K --> L[Share Experiences];
-    L --> M[End];
-    D --> N[Specific Use Cases];
-    N --> O[IoT Devices for Manufacturing];`).then(({svg}) => {
-          const container = document.getElementById('mermaid-1757885851775-moouly44z-render');
+    mermaid.render('mermaid-1757893841798-hin2899fx-svg', `flowchart TD;
+    A[Start] --> B[Identify Data Source];
+    B -->|IoT Devices| C[Choose Data Ingestion Method];
+    B -->|Batch Data| C;
+    C -->|Real-time| D[Process Data with Kafka/Kinesis];
+    C -->|Batch| E[Process Data with ETL];
+    D --> F[Store Data in Data Warehouse];
+    E --> F;
+    F --> G[Create Dashboards];
+    G --> H[Evaluate Use Cases];
+    H -->|Fraud Detection| I[Address Challenges];
+    H -->|Business Insights| I;
+    I --> J[End];`).then(({svg}) => {
+          const container = document.getElementById('mermaid-1757893841798-hin2899fx-render');
           if (container) {
             container.innerHTML = svg;
           }
         }).catch(err => {
           console.error('Mermaid rendering error:', err);
-          const container = document.getElementById('mermaid-1757885851775-moouly44z-render');
+          const container = document.getElementById('mermaid-1757893841798-hin2899fx-render');
           if (container) {
             container.innerHTML = '<div class="mermaid-error">Error rendering diagram: ' + err.message + '</div>';
           }

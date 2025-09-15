@@ -257,6 +257,45 @@ class BrowserAssistant {
     }
   }
 
+
+  // Safe HTML insertion that works with CSP
+  insertHTMLWithScripts(htmlString, targetElement) {
+    // Create a temporary container to parse the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;  // Parse HTML (scripts won't run here)
+  
+    // Extract and handle scripts separately
+    const scripts = tempDiv.querySelectorAll('script');
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement('script');  // Create new script element
+      if (oldScript.src) {
+        newScript.src = oldScript.src;  // For external scripts
+        newScript.type = oldScript.type || 'text/javascript';
+      } else {
+        newScript.textContent = oldScript.textContent;  // For inline scripts
+      }
+      oldScript.parentNode.removeChild(oldScript);  // Remove original non-executing script
+    });
+  
+    // Append non-script content first
+    while (tempDiv.firstChild) {
+      targetElement.appendChild(tempDiv.firstChild);
+    }
+  
+    // Append and execute scripts (in order)
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement('script');
+      if (oldScript.src) {
+        newScript.src = oldScript.src;
+        newScript.type = oldScript.type || 'text/javascript';
+        newScript.onload = () => console.log('Script loaded');  // Optional: Handle load
+      } else {
+        newScript.textContent = oldScript.textContent;
+      }
+      targetElement.appendChild(newScript);  // Appending triggers execution
+    });
+  }
+
   addMessage(sender, content, isLoading = false) {
     const chatContainer = document.getElementById('chat-container');
     const messageDiv = document.createElement('div');
@@ -282,9 +321,10 @@ class BrowserAssistant {
     } else {
       // Render markdown for assistant messages, plain text for user messages
       if (sender === 'assistant') {
-        console.log('Content script: Content before rendering:', content);
-        messageDiv.innerHTML = this.renderMarkdown(content);
-        console.log('Content script: Rendered markdown for assistant:', messageDiv.innerHTML);
+        // console.log('Content script: Content before rendering:', content);
+        content = this.renderMarkdown(content);
+        this.insertHTMLWithScripts(content, messageDiv);
+        console.log('Content script: Rendered markdown for assistant:', content);
       } else {
         messageDiv.textContent = content;
       }
@@ -367,6 +407,7 @@ class BrowserAssistant {
     
     return html;
   }
+
 }
 
 // Initialize the assistant when the page loads
