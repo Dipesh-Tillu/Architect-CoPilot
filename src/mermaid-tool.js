@@ -33,11 +33,14 @@ export class MermaidDiagramTool extends Tool {
       }
 
       // Create a unique ID for the diagram
-      const diagramId = `mermaid-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const diagramId = `mermaid-id`;
       
-      // Return HTML that includes Mermaid.js and proper rendering
+      // Return HTML that uses external script for rendering
       const mermaidHtml = `
-        <div class="mermaid-diagram" id="${diagramId}">
+      <head>  
+        <script src="src/mermaid-render.js"></script>  <!-- Adjust path as needed -->
+      </head>
+        <div class="mermaid-diagram" id="${diagramId}" data-diagram-id="${diagramId}" data-mermaid-code="${mermaidCode.replace(/"/g, '&quot;')}">
           <div class="mermaid-code">
             <pre><code>${mermaidCode}</code></pre>
           </div>
@@ -46,52 +49,20 @@ export class MermaidDiagramTool extends Tool {
           </div>
         </div>
         <script>
-          // Load Mermaid.js if not already loaded
-          if (typeof mermaid === 'undefined') {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js';
-            script.onload = function() {
-              mermaid.initialize({ 
-                startOnLoad: false,
-                theme: 'default',
-                themeVariables: {
-                  primaryColor: '#007bff',
-                  primaryTextColor: '#333',
-                  primaryBorderColor: '#007bff',
-                  lineColor: '#333',
-                  secondaryColor: '#f8f9fa',
-                  tertiaryColor: '#fff'
-                }
-              });
-              // Render the specific diagram
-              mermaid.render('${diagramId}-svg', \`${mermaidCode}\`).then(({svg}) => {
-                const container = document.getElementById('${diagramId}-render');
-                if (container) {
-                  container.innerHTML = svg;
-                }
-              }).catch(err => {
-                console.error('Mermaid rendering error:', err);
-                const container = document.getElementById('${diagramId}-render');
-                if (container) {
-                  container.innerHTML = '<div class="mermaid-error">Error rendering diagram: ' + err.message + '</div>';
-                }
-              });
-            };
-            document.head.appendChild(script);
+          // Call the external render function
+          console.log('Attempting to call renderMermaidDiagram...');
+          console.log('renderMermaidDiagram type:', typeof renderMermaidDiagram);
+          console.log('window.renderMermaidDiagram type:', typeof window.renderMermaidDiagram);
+          
+          if (typeof renderMermaidDiagram === 'function') {
+            console.log('Calling renderMermaidDiagram directly');
+            renderMermaidDiagram('${diagramId}', \`${mermaidCode}\`);
+          } else if (typeof window.renderMermaidDiagram === 'function') {
+            console.log('Calling window.renderMermaidDiagram');
+            window.renderMermaidDiagram('${diagramId}', \`${mermaidCode}\`);
           } else {
-            // Mermaid is already loaded, render immediately
-            mermaid.render('${diagramId}-svg', \`${mermaidCode}\`).then(({svg}) => {
-              const container = document.getElementById('${diagramId}-render');
-              if (container) {
-                container.innerHTML = svg;
-              }
-            }).catch(err => {
-              console.error('Mermaid rendering error:', err);
-              const container = document.getElementById('${diagramId}-render');
-              if (container) {
-                container.innerHTML = '<div class="mermaid-error">Error rendering diagram: ' + err.message + '</div>';
-              }
-            });
+            console.error('renderMermaidDiagram function not found');
+            console.log('Available window properties:', Object.keys(window).filter(key => key.includes('render')));
           }
         </script>
       `;

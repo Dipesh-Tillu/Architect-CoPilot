@@ -33,6 +33,7 @@ module.exports = {
         { from: 'manifest.json', to: 'manifest.json' },
         { from: 'popup.html', to: 'popup.html' },
         { from: 'content.css', to: 'content.css' },
+        { from: 'src/mermaid-render.js', to: 'mermaid-render.js' },
         { from: 'test.html', to: 'test.html' },
         { from: 'test-langgraph.html', to: 'test-langgraph.html' },
         { from: 'test-background.html', to: 'test-background.html' },

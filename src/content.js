@@ -259,41 +259,139 @@ class BrowserAssistant {
 
 
   // Safe HTML insertion that works with CSP
-  insertHTMLWithScripts(htmlString, targetElement) {
-    // Create a temporary container to parse the HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlString;  // Parse HTML (scripts won't run here)
-  
-    // Extract and handle scripts separately
-    const scripts = tempDiv.querySelectorAll('script');
-    scripts.forEach((oldScript) => {
-      const newScript = document.createElement('script');  // Create new script element
-      if (oldScript.src) {
-        newScript.src = oldScript.src;  // For external scripts
-        newScript.type = oldScript.type || 'text/javascript';
-      } else {
-        newScript.textContent = oldScript.textContent;  // For inline scripts
-      }
-      oldScript.parentNode.removeChild(oldScript);  // Remove original non-executing script
+  setHTMLAndRunScripts(container, html) {
+    container.innerHTML = html; // scripts inside won't run yet
+   
+    // Find inert scripts and replace with real ones
+    container.querySelectorAll('script').forEach(oldScript => {
+      const s = document.createElement('script');
+      // copy attributes (src, type, async, defer, nonce, etc.)
+      for (const { name, value } of oldScript.attributes) s.setAttribute(name, value);
+      // inline code
+      if (!s.src) s.textContent = oldScript.textContent;
+      oldScript.replaceWith(s); // inserting the *new* script executes it
     });
-  
-    // Append non-script content first
-    while (tempDiv.firstChild) {
-      targetElement.appendChild(tempDiv.firstChild);
-    }
-  
-    // Append and execute scripts (in order)
-    scripts.forEach((oldScript) => {
-      const newScript = document.createElement('script');
-      if (oldScript.src) {
-        newScript.src = oldScript.src;
-        newScript.type = oldScript.type || 'text/javascript';
-        newScript.onload = () => console.log('Script loaded');  // Optional: Handle load
-      } else {
-        newScript.textContent = oldScript.textContent;
-      }
-      targetElement.appendChild(newScript);  // Appending triggers execution
-    });
+  }
+
+  // Check if content contains Mermaid diagrams
+  containsMermaidDiagram(content) {
+    return content.includes('mermaid') || 
+           content.includes('graph') || 
+           content.includes('flowchart') || 
+           content.includes('sequenceDiagram') ||
+           content.includes('classDiagram') ||
+           content.includes('stateDiagram') ||
+           content.includes('erDiagram') ||
+           content.includes('journey') ||
+           content.includes('gantt') ||
+           content.includes('pie') ||
+           content.includes('gitgraph');
+  }
+
+  // Create a download link for HTML content
+  createDownloadLink(htmlContent, filename) {
+    // Create a complete HTML document with Mermaid support
+    const fullHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Diagram</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .mermaid-diagram {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .mermaid-code {
+            margin-bottom: 20px;
+        }
+        .mermaid-code pre {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            border: 1px solid #e0e0e0;
+        }
+        .mermaid-container {
+            text-align: center;
+        }
+        .mermaid-error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ffcdd2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mermaid Diagram</h1>
+        ${htmlContent}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#007bff',
+                primaryTextColor: '#333',
+                primaryBorderColor: '#007bff',
+                lineColor: '#333',
+                secondaryColor: '#f8f9fa',
+                tertiaryColor: '#fff'
+            }
+        });
+    </script>
+</body>
+</html>`;
+
+    // Create a blob and download link
+    const blob = new Blob([fullHtml], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    return `
+      <div style="
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        background: #f9f9f9;
+        text-align: center;
+      ">
+        <p style="margin: 0 0 10px 0; color: #666;">This content contains Mermaid diagrams</p>
+        <a href="${url}" download="${filename}" style="
+          display: inline-block;
+          padding: 10px 20px;
+          background: #007bff;
+          color: white;
+          text-decoration: none;
+          border-radius: 6px;
+          font-weight: bold;
+        ">
+          💾 Download HTML
+        </a>
+      </div>
+    `;
   }
 
   addMessage(sender, content, isLoading = false) {
@@ -321,10 +419,20 @@ class BrowserAssistant {
     } else {
       // Render markdown for assistant messages, plain text for user messages
       if (sender === 'assistant') {
-        // console.log('Content script: Content before rendering:', content);
+        console.log('Content script: Content before rendering:', content);
         content = this.renderMarkdown(content);
-        this.insertHTMLWithScripts(content, messageDiv);
         console.log('Content script: Rendered markdown for assistant:', content);
+        
+        // Check if content contains Mermaid diagrams
+        if (this.containsMermaidDiagram(content)) {
+          // Create a download link for Mermaid diagrams
+          const downloadLink = this.createDownloadLink(content, 'mermaid-diagram.html');
+          messageDiv.innerHTML = downloadLink;
+        } else {
+          // Regular content - display normally
+          messageDiv.innerHTML = content;
+        }
+
       } else {
         messageDiv.textContent = content;
       }
